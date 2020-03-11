@@ -19,11 +19,23 @@ class PersonController(personService: PersonService) {
 
 
   def getPeople(): Unit = {
-    personService.getPeople().foreach(personList => personService.returnPeople(personList.toList))
+    personService.getPeople().onComplete {
+      case Success(value) => value.onComplete {
+        case Success(list) => personService.returnPeople(list.toList)
+      }
+    }
   }
 
   def getPerson(id: Int): Unit = {
-    personService.getPerson(id)
+    personService.getPerson(id).foreach(el => el.foreach(list => personService.returnPeople(List(list))))
+  }
+
+  def deletePerson(id: Int): Unit = {
+    personService.deletePerson(id)
+  }
+
+  def updatePerson(id: Int, personDao: PersonDAO) = {
+    personService.updatePerson(id, personDao)
   }
 
 

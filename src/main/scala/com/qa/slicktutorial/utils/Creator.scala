@@ -1,15 +1,27 @@
 package com.qa.slicktutorial.utils
 
-import com.qa.slicktutorial.Main.{connector, db, dropPeopleCmd, initPersonCmd}
+import com.qa.slicktutorial.persistence.domain.Person
+import slick.lifted.TableQuery
+
+import slick.lifted.TableQuery
+import slick.jdbc.MySQLProfile.api._
+
 import scala.concurrent.{Await, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class Creator {
+object Creator {
+  val personTable = TableQuery[Person]
+  val dropPeopleCmd = DBIO.seq(personTable.schema.drop)
+  val initPersonCmd = DBIO.seq(personTable.schema.create)
+
   def dropDB(): Unit = {
-    val dropFuture = Future{db.run(dropPeopleCmd)}
+    val dropFuture = Future{
+      Connector.db.run(dropPeopleCmd)
+    }
+
     Await.result(dropFuture, Duration.Inf).andThen{
       case Success(_) =>
         println("Dropping successful!")
@@ -23,7 +35,7 @@ class Creator {
 
   def initialisePerson: Future[Unit] = {
     val setupFuture = Future {
-      connector.db.run(initPersonCmd)
+      Connector.db.run(initPersonCmd)
     }
     Await.result(setupFuture, Duration.Inf).andThen {
       case Success(_) =>

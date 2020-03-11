@@ -16,7 +16,8 @@ object Creator {
   val dropPeopleCmd = DBIO.seq(personTable.schema.drop)
   val initPersonCmd = DBIO.seq(personTable.schema.create)
   val personService = new PersonService
-  val db = personService.db
+  val conn = new Connector
+  val db = conn.db
   def dropDB(): Unit = {
     val dropFuture = Future{
       db.run(dropPeopleCmd)

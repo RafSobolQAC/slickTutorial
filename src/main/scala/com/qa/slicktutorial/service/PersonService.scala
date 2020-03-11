@@ -13,19 +13,18 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 import slick.jdbc
+import slick.sql.FixedSqlAction
+
+import scala.concurrent.duration.DurationConversions.spanConvert.R
+
+//import scala.concurrent.duration.DurationConversions.
 
 class PersonService() {
 
   val personTable = TableQuery[Person]
 
-  def getDb: jdbc.MySQLProfile.backend.Database = {
-    val conn = new Connector
-    conn.db
-  }
 
-  val db = getDb
-
-  def createPerson(personDao: PersonDAO): Future[Future[PersonDAO]] = {
+  def createPerson(db: jdbc.MySQLProfile.backend.Database, personDao: PersonDAO): Future[Future[PersonDAO]] = {
     val insertPeople = Future {
       val query = personTable ++= PersonParser.parse(personDao)
       println(query.statements.head)
@@ -35,7 +34,7 @@ class PersonService() {
   }
 
 
-  def getPeople(): Future[Future[ListBuffer[PersonDAO]]] = {
+  def getPeople(db: jdbc.MySQLProfile.backend.Database): Future[Future[ListBuffer[PersonDAO]]] = {
     val queryFuture = Future {
       var peopleList = new scala.collection.mutable.ListBuffer[PersonDAO]
 
@@ -49,7 +48,7 @@ class PersonService() {
     //    waitForComplete(queryFuture)
   }
 
-  def getPerson(id: Int): Future[Future[PersonDAO]] = {
+  def getPerson(db: jdbc.MySQLProfile.backend.Database, id: Int): Future[Future[PersonDAO]] = {
     var personToReturn = new PersonDAO(0, "a", "b", 1)
     val queryFuture = Future {
       db.run(personTable.filter(_.id === id).result
@@ -60,7 +59,7 @@ class PersonService() {
   }
 
 
-  def deletePerson(id: Int) = {
+  def deletePerson(db: jdbc.MySQLProfile.backend.Database, id: Int) = {
     val toDelete = personTable.filter(_.id === id).delete
     println(toDelete.statements.head)
 
@@ -70,7 +69,7 @@ class PersonService() {
     queryFuture
   }
 
-  def updatePerson(id: Int, person: PersonDAO): Future[Future[PersonDAO]] = {
+  def updatePerson(db: jdbc.MySQLProfile.backend.Database, id: Int, person: PersonDAO): Future[Future[PersonDAO]] = {
     val toUpdate = personTable.filter(_.id === id)
     val queryUpdater = toUpdate.update(PersonParser.parseWithId(person, id).head)
     val futureUpdate = Future {

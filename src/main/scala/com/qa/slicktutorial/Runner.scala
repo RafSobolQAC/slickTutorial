@@ -2,13 +2,21 @@ package com.qa.slicktutorial
 
 import com.qa.slicktutorial.controller.PersonController
 import com.qa.slicktutorial.service.PersonService
-import com.qa.slicktutorial.utils.{Creator, InputGetter}
+import com.qa.slicktutorial.utils.{Connector, Creator, InputGetter}
+import slick.jdbc
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class Runner {
-  val personController = new PersonController(new PersonService())
+  def getDb: jdbc.MySQLProfile.backend.Database = {
+    val conn = new Connector
+    conn.db
+  }
+  val db = getDb
+
+  val personController = new PersonController(db, new PersonService())
+
   def doAThing(): Any = {
       InputGetter.getAction match {
         case "create" => personController.createPerson(InputGetter.getPersonDao)

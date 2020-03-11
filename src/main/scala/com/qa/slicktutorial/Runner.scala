@@ -2,7 +2,7 @@ package com.qa.slicktutorial
 
 import com.qa.slicktutorial.controller.PersonController
 import com.qa.slicktutorial.service.PersonService
-import com.qa.slicktutorial.utils.{Connector, Creator, InputGetter}
+import com.qa.slicktutorial.utils.{Creator, InputGetter}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -10,7 +10,7 @@ import scala.concurrent.duration.Duration
 class Runner {
   val personController = new PersonController(new PersonService())
   def doAThing(): Any = {
-      InputGetter.getAction() match {
+      InputGetter.getAction match {
         case "create" => personController.createPerson(InputGetter.getPersonDao)
         case "readall" => personController.getPeople()
         case "readone" =>

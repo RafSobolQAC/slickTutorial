@@ -4,7 +4,7 @@ import com.qa.slicktutorial.controller.PersonController
 import com.qa.slicktutorial.persistence.dao.PersonDAO
 import com.qa.slicktutorial.persistence.domain.Person
 import com.qa.slicktutorial.service.PersonService
-import com.qa.slicktutorial.utils.{Connector, Creator}
+import com.qa.slicktutorial.utils.{Creator}
 import slick.lifted.TableQuery
 import slick.jdbc.MySQLProfile.api._
 
